@@ -1,5 +1,7 @@
 cc=gcc -Wall
-
+forShared=-c -fPIC
+forSharedD=powerForShared.o basicMathForShared.o
+main=main.o
 all: mains maind
 
 mymaths: libmyMath.a
@@ -7,31 +9,31 @@ mymaths: libmyMath.a
 mymathd: libmyMath.so
 
 mains: main.o mymaths
-	${cc} main.o libmyMath.a -o mains
+	${cc} ${main} libmyMath.a -o mains
 	
 maind: main.o mymathd
-	${cc} main.o libmyMath.so -o maind
+	${cc} ${main} libmyMath.so -o maind
 	
 main.o: main.c 
-	${cc} -c main.c -o main.o -I.
+	${cc} -c main.c -o ${main} -I.
 	
-libmyMath.a: power1.o basicMath1.o
-	ar -rcs libmyMath.a power1.o basicMath1.o
+libmyMath.a: power.o basicMath.o
+	ar -rcs libmyMath.a power.o basicMath.o
 	
-libmyMath.so: power2.o basicMath2.o
-	${cc} -shared -o libmyMath.so power2.o basicMath2.o
+libmyMath.so: powerForShared.o basicMathForShared.o
+	${cc} -shared -o libmyMath.so ${forSharedD}
 	
-power1.o: power.c myMath.h
-	${cc} -c power.c -o power1.o
+power.o: power.c myMath.h
+	${cc} -c power.c -o power.o
 	
-basicMath1.o: basicMath.c myMath.h
-	${cc} -c basicMath.c -o basicMath1.o
+basicMath.o: basicMath.c myMath.h
+	${cc} -c basicMath.c -o basicMath.o
 	
-power2.o: power.c myMath.h
-	${cc} -c -fPIC power.c -o power2.o
+powerForShared.o: power.c myMath.h
+	${cc} ${forShared} power.c -o powerForShared.o
 	
-basicMath2.o: basicMath.c myMath.h
-	${cc} -c -fPIC basicMath.c -o basicMath2.o
+basicMathForShared.o: basicMath.c myMath.h
+	${cc} ${forShared} basicMath.c -o basicMathForShared.o
 	
 clean:
 	rm -f *.o *.a *.so mains maind
